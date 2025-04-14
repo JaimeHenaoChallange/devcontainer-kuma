@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: python:3.9-slim
+          image: jaimehenao8126/backend:latest
           command: ["python", "-m", "http.server", "8080"]
           ports:
             - containerPort: 8080
