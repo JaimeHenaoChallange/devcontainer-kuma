@@ -253,17 +253,35 @@ EOF
     pause
 }
 
+# Función para verificar la versión actual de Kuma instalada
+check_kuma_version() {
+    show_process "Verificando la versión actual de Kuma instalada..."
+
+    # Obtener la versión actual de Kuma desde Helm
+    local current_version
+    current_version=$(helm list -n kuma-system -o json | jq -r '.[0].chart' | awk -F'-' '{print $2}')
+
+    if [[ -z "$current_version" ]]; then
+        show_error "No se pudo determinar la versión actual de Kuma. Asegúrate de que Kuma esté instalado."
+        return 1
+    fi
+
+    show_success "La versión actual de Kuma instalada es: ${GREEN}$current_version${NC}"
+    pause
+}
+
 # Submenú para Kuma
 show_kuma_menu() {
     clear
     echo -e "${GREEN}=== Menú Kuma ===${NC}"
     echo "1. Verificar dependencias"
     echo "2. Listar versiones disponibles de Kuma"
-    echo "3. Instalar Kuma con una versión específica usando Helm"
-    echo "4. Actualizar Kuma con Helm"
-    echo "5. Habilitar inyección de sidecars"
-    echo "6. Configurar Ingress para Kuma"
-    echo "7. Salir"
+    echo "3. Verificar versión actual de Kuma"
+    echo "4. Instalar Kuma con una versión específica usando Helm"
+    echo "5. Actualizar Kuma con Helm"
+    echo "6. Habilitar inyección de sidecars"
+    echo "7. Configurar Ingress para Kuma"
+    echo "8. Salir"
     echo -e "${YELLOW}Selecciona una opción:${NC}"
 }
 
@@ -274,11 +292,12 @@ while true; do
     case $kuma_opt in
         1) check_dependencies ;;
         2) list_kuma_versions ;;
-        3) install_kuma_with_helm_version ;;
-        4) upgrade_kuma_with_helm ;;
-        5) enable_kuma_sidecar_injection ;;
-        6) configure_kuma_ingress ;;
-        7) break ;;
+        3) check_kuma_version ;;  # Nueva opción para verificar la versión actual
+        4) install_kuma_with_helm_version ;;
+        5) upgrade_kuma_with_helm ;;
+        6) enable_kuma_sidecar_injection ;;
+        7) configure_kuma_ingress ;;
+        8) break ;;
         *) show_error "Opción inválida." ;;
     esac
 done
