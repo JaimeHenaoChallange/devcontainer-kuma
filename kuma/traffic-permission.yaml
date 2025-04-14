@@ -1,0 +1,12 @@
+apiVersion: kuma.io/v1alpha1
+kind: TrafficPermission
+metadata:
+  name: allow-httpbin
+mesh: default
+spec:
+  sources:
+  - match:
+      kuma.io/service: sleep
+  destinations:
+  - match:
+      kuma.io/service: httpbin
