@@ -131,18 +131,19 @@ docker push <dockerhub-username>/redis:latest
 Aplica los manifiestos de Kubernetes para cada componente:
 
 ```bash
-kubectl apply -f [deployment.yaml](http://_vscodecontentref_/1)
-kubectl apply -f [service.yaml](http://_vscodecontentref_/2)
+kubectl apply -f backend/deployment.yaml
+kubectl apply -f backend/service.yaml
 
-kubectl apply -f [deployment.yaml](http://_vscodecontentref_/3)
-kubectl apply -f [service.yaml](http://_vscodecontentref_/4)
+kubectl apply -f database/deployment.yaml
+kubectl apply -f database/service.yaml
 
-kubectl apply -f [deployment.yaml](http://_vscodecontentref_/5)
-kubectl apply -f [service.yaml](http://_vscodecontentref_/6)
+kubectl apply -f frontend/deployment.yaml
+kubectl apply -f frontend/service.yaml
 
-kubectl apply -f [deployment.yaml](http://_vscodecontentref_/7)
-kubectl apply -f [service.yaml](http://_vscodecontentref_/8)
+kubectl apply -f redis/deployment.yaml
+kubectl apply -f redis/service.yaml
 ```
+
 ### **4. Configurar Ingress**
 Configura un recurso Ingress para exponer el servicio del frontend y otros servicios según sea necesario. Asegúrate de agregar el IP del nodo de Minikube al archivo /etc/hosts.
 
@@ -158,6 +159,61 @@ Por defecto, Kubernetes se vincula a la IP de una interfaz específica en lugar 
 3. Despliegue en Kubernetes
 4. Configuración de Kuma y Ingress
 5. Pruebas de Conectividad y Observabilidad
+
+---
+
+## **Estructura del Repositorio**
+
+```plaintext
+/workspaces/kuma/
+├── backend/
+│   ├── argocd-application.yaml
+│   ├── deployment.yaml
+│   ├── service.yaml
+│   └── Docker/
+│       └── Dockerfile
+├── database/
+│   ├── argocd-application.yaml
+│   ├── deployment.yaml
+│   ├── service.yaml
+│   └── Docker/
+│       └── Dockerfile
+├── frontend/
+│   ├── argocd-application.yaml
+│   ├── deployment.yaml
+│   ├── ingress.yaml
+│   ├── package.json
+│   ├── service.yaml
+│   └── Docker/
+│       └── Dockerfile
+├── redis/
+│   ├── argocd-application.yaml
+│   ├── deployment.yaml
+│   ├── service.yaml
+│   └── Docker/
+│       └── Dockerfile
+├── kuma/
+│   ├── argocd-application.yaml
+│   ├── httpbin.yaml
+│   ├── kuma-ingress.yaml
+│   ├── kuma-mtls.yaml
+│   └── ...
+├── repos/
+│   ├── app-1/
+│   │   ├── .gitignore
+│   │   ├── README.md
+│   │   ├── .github/
+│   │   ├── Docker/
+│   │   └── Kubernetes/
+│   ├── app-2/
+│   └── KubeOps/
+│       ├── README.md
+│       ├── Docker/
+│       ├── Kubernetes/
+│       └── .github/
+├── setup.sh
+└── README.md
+```
 
 ---
 
