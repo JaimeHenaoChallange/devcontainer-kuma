@@ -3,6 +3,7 @@
 
 # Ignorar el directorio repos
 repos/
+kuma-2.10.1/
 
 # Ignorar archivos y directorios comunes
 node_modules/
