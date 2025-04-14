@@ -11,6 +11,37 @@ El objetivo principal es proporcionar un entorno práctico para aprender y exper
 - Gestionar versiones de Kuma (instalación, actualización).
 - Configurar la inyección de sidecars para habilitar la malla de servicios.
 - Configurar Ingress para acceder al plano de control de Kuma.
+- Desplegar aplicaciones dockerizadas (frontend, backend, database y Redis) y gestionarlas con Kuma.
+
+---
+
+## **Arquitectura del Proyecto**
+
+El laboratorio incluye un clúster de Kubernetes con las siguientes aplicaciones y componentes:
+
+- **Frontend**: Una aplicación React servida con Nginx.
+- **Backend**: Una API básica escrita en Python.
+- **Database**: Un contenedor de PostgreSQL para almacenar datos.
+- **Redis**: Un contenedor de Redis para almacenamiento en caché.
+- **Kuma**: Malla de servicios para gestionar el tráfico entre los servicios.
+
+### Diagrama de Arquitectura
+
+```plaintext
++-------------------+       +-------------------+       +-------------------+
+|                   |       |                   |       |                   |
+|     Frontend      | <---> |      Backend      | <---> |     Database      |
+|                   |       |                   |       |                   |
++-------------------+       +-------------------+       +-------------------+
+                                ^
+                                |
+                                v
+                          +-------------------+
+                          |       Redis       |
+                          +-------------------+
+
+                          [Gestionado por Kuma]
+```
 
 ---
 
@@ -72,3 +103,69 @@ Clona este repositorio en tu máquina local o en un entorno de desarrollo compat
 ```bash
 git clone <URL_DEL_REPOSITORIO>
 cd <NOMBRE_DEL_REPOSITORIO>
+```
+---
+
+### **2. Construir las Imágenes Docker**
+Construye las imágenes para cada componente y súbelas a Docker Hub:
+
+```bash
+# Frontend
+docker build -t <dockerhub-username>/frontend:latest -f frontend/Docker/Dockerfile frontend/
+docker push <dockerhub-username>/frontend:latest
+
+# Backend
+docker build -t <dockerhub-username>/backend:latest backend/
+docker push <dockerhub-username>/backend:latest
+
+# Database
+docker build -t <dockerhub-username>/database:latest database/
+docker push <dockerhub-username>/database:latest
+
+# Redis
+docker build -t <dockerhub-username>/redis:latest redis/
+docker push <dockerhub-username>/redis:latest
+```
+
+### **3. Desplegar las Aplicaciones**
+Aplica los manifiestos de Kubernetes para cada componente:
+
+```bash
+kubectl apply -f [deployment.yaml](http://_vscodecontentref_/1)
+kubectl apply -f [service.yaml](http://_vscodecontentref_/2)
+
+kubectl apply -f [deployment.yaml](http://_vscodecontentref_/3)
+kubectl apply -f [service.yaml](http://_vscodecontentref_/4)
+
+kubectl apply -f [deployment.yaml](http://_vscodecontentref_/5)
+kubectl apply -f [service.yaml](http://_vscodecontentref_/6)
+
+kubectl apply -f [deployment.yaml](http://_vscodecontentref_/7)
+kubectl apply -f [service.yaml](http://_vscodecontentref_/8)
+```
+### **4. Configurar Ingress**
+Configura un recurso Ingress para exponer el servicio del frontend y otros servicios según sea necesario. Asegúrate de agregar el IP del nodo de Minikube al archivo /etc/hosts.
+
+Nota Importante sobre Ingress
+Por defecto, Kubernetes se vincula a la IP de una interfaz específica en lugar de localhost o todas las interfaces. Por esta razón, debes usar la IP del nodo de Kubernetes (por ejemplo, la IP de Minikube) para conectarte, incluso si solo tienes un nodo.
+
+---
+
+## **Flujo de Trabajo**
+
+1. Construcción de Imágenes Docker
+2. Subida de Imágenes a Docker Hub
+3. Despliegue en Kubernetes
+4. Configuración de Kuma y Ingress
+5. Pruebas de Conectividad y Observabilidad
+
+---
+
+## **Notas**
+
+- Kuma: Gestiona el tráfico entre servicios y proporciona observabilidad.
+- Minikube: Asegúrate de usar el IP del nodo de Minikube para acceder a los servicios.
+- Docker Hub: Reemplaza <dockerhub-username> con tu nombre de usuario en Docker Hub.
+
+---
+
