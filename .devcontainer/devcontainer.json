@@ -1,0 +1,63 @@
+{
+  "name": "k8s-kuma",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "k8s-kuma",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "features": {
+    "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {
+      "enabled": true,
+      "kubectlVersion": "latest",
+      "kubectlAliases": true,
+      "kumaVersion": "latest",
+      "kumactlVersion": "latest",
+      "helmVersion": "latest",
+      "helmAliases": true,
+      "kumactlAliases": true,
+      "kumaAliases": true,
+      "kubeadmVersion": "latest",
+      "kubeadmAliases": true,
+      "kindVersion": "latest",
+      "kindAliases": true,
+      "k9sVersion": "latest",
+      "k9sAliases": true,
+      "kubeShellVersion": "latest",
+      "kubeShellAliases": true,
+      "kubeletVersion": "latest",
+      "kubeletAliases": true,
+      "dockerComposeVersion": "latest",
+      "dockerComposeAliases": true
+    },
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "dockerComposeVersion": "latest",
+      "dockerComposeAliases": true,
+      "dockerComposeCompletion": true,
+      "dockerComposeBashCompletion": true,
+      "dockerComposeZshCompletion": true,
+      "dockerComposeFishCompletion": true,
+      "dockerComposePowershellCompletion": true
+    },
+    "ghcr.io/eliises/devcontainer-features/bash-profile:1.0.1": {
+      "bashProfileAliases": true,
+      "bashProfileVersion": "latest"
+    }
+  },
+  "forwardPorts": [
+    22, 8443, // 8443 es el puerto por defecto de Kubernetes API Server
+    3000, 3001, 3002, 3003,
+    7007, 8080, 8081, 8082, 8083
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-ossdata.vscode-postgresql",
+        "ms-vscode.cpptools",
+        "ms-azuretools.vscode-docker"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  },
+  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y openssh-server && sudo mkdir -p /var/run/sshd && echo 'PermitRootLogin yes' | sudo tee -a /etc/ssh/sshd_config && sudo service ssh start && mkdir -p ~/.ssh && echo '$(cat ~/.ssh/id_ed25519.pub)' >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys",
+  "postStopCommand": "minikube stop || true"
+}

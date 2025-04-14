@@ -1,0 +1,25 @@
+# Ignorar el archivo .env
+.env
+
+# Ignorar el directorio repos
+repos/
+
+# Ignorar archivos y directorios comunes
+node_modules/
+.DS_Store
+*.log
+*.swp
+*.tmp
+*.bak
+*.old
+*.orig
+*.lock
+
+# Ignorar configuraciones específicas de sistemas operativos
+Thumbs.db
+desktop.ini
+
+# Ignorar configuraciones específicas de IDEs/editores
+.vscode/
+.idea/
+*.iml
