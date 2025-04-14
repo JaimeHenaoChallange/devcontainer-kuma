@@ -28,16 +28,66 @@ check_command() {
     local cmd=$1
     if ! command -v "$cmd" &>/dev/null; then
         show_error "El comando '$cmd' no está disponible. Por favor, instálalo antes de continuar."
+        case "$cmd" in
+            kubectl)
+                echo -e "${YELLOW}Sugerencia:${NC} Puedes instalar kubectl siguiendo las instrucciones oficiales: https://kubernetes.io/docs/tasks/tools/install-kubectl/"
+                ;;
+            helm)
+                echo -e "${YELLOW}Sugerencia:${NC} Puedes instalar Helm siguiendo las instrucciones oficiales: https://helm.sh/docs/intro/install/"
+                ;;
+            aws)
+                echo -e "${YELLOW}Sugerencia:${NC} Puedes instalar AWS CLI siguiendo las instrucciones oficiales: https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html"
+                ;;
+            eksctl)
+                echo -e "${YELLOW}Sugerencia:${NC} Puedes instalar eksctl siguiendo las instrucciones oficiales: https://eksctl.io/introduction/#installation"
+                ;;
+        esac
         exit 1
     fi
 }
 
 # Verificar que los comandos necesarios estén disponibles
 check_dependencies() {
-    show_process "Verificando dependencias necesarias..."
+    show_process "Verificando dependencias necesarias para trabajar con Kubernetes y EKS..."
+
+    # Verificar herramientas básicas
     check_command "kubectl"
     check_command "helm"
-    show_success "Todas las dependencias están disponibles."
+
+    # Verificar herramientas específicas de AWS y EKS
+    check_command "aws"
+    check_command "eksctl"
+
+    # Verificar configuración de AWS CLI
+    show_process "Verificando configuración de AWS CLI..."
+    if ! aws sts get-caller-identity &>/dev/null; then
+        show_error "No se pudo verificar la identidad de AWS. Asegúrate de que las credenciales de AWS estén configuradas correctamente."
+        echo -e "${YELLOW}Sugerencia:${NC} Configura tus credenciales de AWS usando el comando: aws configure"
+        exit 1
+    fi
+    show_success "AWS CLI está configurado correctamente."
+
+    # Verificar acceso al clúster de EKS
+    show_process "Verificando acceso al clúster de EKS..."
+    local cluster_name
+    cluster_name=$(eksctl get cluster -o json | jq -r '.[0].metadata.name' 2>/dev/null)
+    if [[ -z "$cluster_name" ]]; then
+        show_error "No se encontró ningún clúster de EKS accesible. Asegúrate de que el clúster esté creado y configurado."
+        echo -e "${YELLOW}Sugerencia:${NC} Puedes crear un clúster de EKS usando eksctl: eksctl create cluster --name <nombre-del-cluster>"
+        exit 1
+    fi
+    show_success "Clúster de EKS detectado: ${GREEN}$cluster_name${NC}"
+
+    # Verificar conectividad con el clúster
+    show_process "Verificando conectividad con el clúster de EKS..."
+    if ! kubectl get nodes &>/dev/null; then
+        show_error "No se pudo conectar al clúster de EKS. Asegúrate de que el contexto de kubectl esté configurado correctamente."
+        echo -e "${YELLOW}Sugerencia:${NC} Configura el contexto de kubectl para el clúster de EKS usando: aws eks update-kubeconfig --name $cluster_name"
+        exit 1
+    fi
+    show_success "Conectividad con el clúster de EKS verificada."
+
+    show_success "Todas las dependencias están disponibles y configuradas correctamente. El entorno está listo para trabajar con EKS."
 }
 
 # Función para listar versiones disponibles de Kuma con Helm
